@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { gsap } from "gsap";
 import { FIELD_SIZE, type Model } from './model';
+import { swapD2 } from './utils';
 
 const OFFSET = .4 as const;
 
@@ -10,7 +12,9 @@ export class View {
   private _renderer: THREE.WebGLRenderer;
   private _camera: THREE.Camera;
 
-  private _crystals: THREE.Mesh[] = []
+  private _crystals: (THREE.Mesh | null)[][] = [];
+
+  get canvas() { return this._renderer.domElement; }
 
   constructor(model: Model) {
     this._model = model;
@@ -45,26 +49,54 @@ export class View {
     this._renderer.setAnimationLoop(() => this.animate());
   }
 
-  initModels(models: THREE.Mesh[]) {
-    for (let x = 0; x < FIELD_SIZE[0]; x++) {
-      for (let y = 0; y < FIELD_SIZE[1]; y++) {
-        const v = this._model.field[x][y];
+  initCrystals(models: THREE.Mesh[]) {
+    for (let row = 0; row < FIELD_SIZE[0]; row++) {
+      this._crystals[row] = [];
+      for (let col = 0; col < FIELD_SIZE[1]; col++) {
+        const v = this._model.field[row][col];
+        if (v === null) continue;
         const random = models[v];
         const crystal = new THREE.Mesh(random.geometry, random.material);
         this._scene.add(crystal);
-        crystal.position.set(x * OFFSET, y * -OFFSET, 0);
+        crystal.position.set(col * OFFSET, row * -OFFSET, 0);
         crystal.rotation.set(0, 0, 0);
         crystal.scale.set(.05, .05, .05);
-        this._crystals.push(crystal);
+        this._crystals[row][col] = crystal;
       }
     }
     console.log("models are initialized")
   }
 
-  animate() {
-    this._crystals.forEach((crystal, i) => {
-      crystal.rotation.y += 0.02;
-    })
+  remove(x: number, y: number) {
+    const crystal = this._crystals[x][y];
+    if (crystal) this._scene.remove(crystal);
+  }
+
+  swap(col: number, row: number, col2: number, row2: number, dir: THREE.Vector2) {
+    const fromCrystal = this._crystals[col][row];
+    const toCrystal = this._crystals[col2][row2];
+    if (fromCrystal === null || toCrystal === null) return;
+    const DISTANCE = .4 as const;
+    gsap.to(fromCrystal.position, {
+      x: "-=" + dir.x * DISTANCE,
+      y: "+=" + dir.y * DISTANCE,
+      duration: .5,
+    });
+    gsap.to(toCrystal.position, {
+      x: "+=" + dir.x * DISTANCE,
+      y: "-=" + dir.y * DISTANCE,
+      duration: .5,
+    });
+    swapD2(this._crystals, col, row, col2, row2);
+  }
+
+  private animate() {
+    for (let row = 0; row < FIELD_SIZE[0]; row++) {
+      for (let col = 0; col < FIELD_SIZE[1]; col++) {
+        const crystal = this._crystals[row][col];
+        if (crystal) crystal.rotation.y += 0.02;
+      }
+    }
 
     // console.log(renderer.info);
     this._renderer.render(this._scene, this._camera);

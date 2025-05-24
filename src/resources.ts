@@ -16,6 +16,6 @@ export class ModelLoader {
     const diamond = gltf.scene.getObjectByName("Diamond") as THREE.Mesh;
     const emerald = gltf.scene.getObjectByName("Emerald") as THREE.Mesh;
     console.log("models are loaded");
-    return [star, heart, diamond, emerald];
+    return [heart, star, diamond, emerald];
   }
 }

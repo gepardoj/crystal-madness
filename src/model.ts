@@ -1,6 +1,6 @@
-import { getRandom } from "./utils";
+import { getRandom, swapD2 } from "./utils";
 
-type Crystal = 0 | 1 | 2 | 3;
+type Crystal = null | 0 | 1 | 2 | 3;
 const CRYSTAL_NUMBER = 4 as const;
 export const FIELD_SIZE = [5, 5] as const;
 
@@ -16,13 +16,23 @@ export class Model {
     this.generateField();
   }
 
+  remove(x: number, y: number) {
+    this._field[x][y] = null;
+  }
+
+  swap(col: number, row: number, col2: number, row2: number) {
+    swapD2(this._field, col, row, col2, row2);
+    console.table(this._field)
+  }
+
   private generateField() {
-    for (let x = 0; x < FIELD_SIZE[0]; x++) {
-      const col: Crystal[] = [];
-      for (let y = 0; y < FIELD_SIZE[1]; y++) {
-        col.push(Math.round(getRandom() * (CRYSTAL_NUMBER - 1)) as Crystal);
+    for (let row = 0; row < FIELD_SIZE[0]; row++) {
+      this._field[row] = [];
+      for (let col = 0; col < FIELD_SIZE[1]; col++) {
+        const crystal = Math.round(getRandom() * (CRYSTAL_NUMBER - 1)) as Crystal;
+        this._field[row][col] = crystal;
       }
-      this._field.push(col);
     }
+    console.table(this._field)
   }
 }

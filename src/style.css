@@ -15,15 +15,17 @@
   box-sizing: border-box;
 }
 
+html {
+  touch-action: none;
+}
+
 body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
 }
 
 #game {
   aspect-ratio: 0.75;
   min-width: 360px;
-  border: 1px solid black;
 }
