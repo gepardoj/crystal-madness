@@ -1,7 +1,7 @@
 import { getRandom } from "./utils";
 
-type Crystal = 0 | 1;
-const CRYSTAL_NUMBER = 2 as const;
+type Crystal = 0 | 1 | 2 | 3;
+const CRYSTAL_NUMBER = 4 as const;
 export const FIELD_SIZE = [5, 5] as const;
 
 export class Model {

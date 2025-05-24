@@ -11,9 +11,11 @@ export class ModelLoader {
 
   async load() {
     const gltf = await this._loader.loadAsync(`/crystal.glb`);
-    const star = gltf.scene.children[0] as THREE.Mesh;
-    const heart = gltf.scene.children[1] as THREE.Mesh;
+    const star = gltf.scene.getObjectByName("Star") as THREE.Mesh;
+    const heart = gltf.scene.getObjectByName("Heart") as THREE.Mesh;
+    const diamond = gltf.scene.getObjectByName("Diamond") as THREE.Mesh;
+    const emerald = gltf.scene.getObjectByName("Emerald") as THREE.Mesh;
     console.log("models are loaded");
-    return { star, heart };
+    return [star, heart, diamond, emerald];
   }
 }

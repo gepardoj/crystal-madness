@@ -21,14 +21,19 @@ export class View {
     this._camera = new THREE.OrthographicCamera();
 
     this._renderer = new THREE.WebGLRenderer({
-      canvas: canvas as HTMLCanvasElement, antialias: true,
+      canvas: canvas as HTMLCanvasElement,
+      antialias: true,
     });
     if (!(canvas instanceof HTMLCanvasElement)) return;
     this._renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-    const light = new THREE.DirectionalLight();
-    light.position.set(1, 1, 1);
+    const light = new THREE.DirectionalLight("white", 5);
+    light.position.set(5, 10, 7).normalize();
     this._scene.add(light);
+
+    const ambient = new THREE.AmbientLight("white", .5);
+    ambient.position.set(1, 1, 1)
+    this._scene.add(ambient);
 
     this._camera.position.set(.8, -.8, 100);
 
@@ -40,15 +45,15 @@ export class View {
     this._renderer.setAnimationLoop(() => this.animate());
   }
 
-  initModels({ star, heart }: { star: THREE.Mesh, heart: THREE.Mesh }) {
+  initModels(models: THREE.Mesh[]) {
     for (let x = 0; x < FIELD_SIZE[0]; x++) {
       for (let y = 0; y < FIELD_SIZE[1]; y++) {
         const v = this._model.field[x][y];
-        const random = [star, heart][v];
+        const random = models[v];
         const crystal = new THREE.Mesh(random.geometry, random.material);
         this._scene.add(crystal);
         crystal.position.set(x * OFFSET, y * -OFFSET, 0);
-        crystal.rotation.set(90, 0, 0);
+        crystal.rotation.set(0, 0, 0);
         crystal.scale.set(.05, .05, .05);
         this._crystals.push(crystal);
       }
@@ -58,7 +63,7 @@ export class View {
 
   animate() {
     this._crystals.forEach((crystal, i) => {
-      crystal.rotation.z += 0.02;
+      crystal.rotation.y += 0.02;
     })
 
     // console.log(renderer.info);
