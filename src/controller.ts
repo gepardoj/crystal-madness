@@ -1,5 +1,5 @@
 import { Vector2 } from "three";
-import { FIELD_SIZE } from "./model";
+import { FIELD_SIZE } from "@/model/model";
 
 type SwapFunc = (col: number, row: number, col2: number, row2: number, direction: Vector2) => void;
 
@@ -9,7 +9,7 @@ export class Controller {
   private _onSwap: SwapFunc;
 
 
-  constructor(canvas: HTMLCanvasElement, { onSwap }: { onSwap: SwapFunc }) {
+  constructor(canvas: HTMLCanvasElement, { onSwap }: { onSwap: SwapFunc; }) {
     this._canvas = canvas;
     this._onSwap = onSwap;
     this.down = this.down.bind(this);

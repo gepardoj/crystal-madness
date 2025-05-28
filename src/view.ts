@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { gsap } from "gsap";
-import { FIELD_SIZE, type Model } from './model';
-import { swapD2 } from './utils';
+import { FIELD_SIZE, type Model } from '@/model/model';
+import { swapD2 } from '@/utils';
 
 const OFFSET = .4 as const;
 
@@ -36,7 +36,7 @@ export class View {
     this._scene.add(light);
 
     const ambient = new THREE.AmbientLight("white", .5);
-    ambient.position.set(1, 1, 1)
+    ambient.position.set(1, 1, 1);
     this._scene.add(ambient);
 
     this._camera.position.set(.8, -.8, 100);
@@ -45,7 +45,7 @@ export class View {
   }
 
   start() {
-    console.log("the render is started")
+    console.log("the render is started");
     this._renderer.setAnimationLoop(() => this.animate());
   }
 
@@ -64,7 +64,20 @@ export class View {
         this._crystals[row][col] = crystal;
       }
     }
-    console.log("models are initialized")
+    console.log("models are initialized");
+  }
+
+  updateCrystals() {
+    for (let row = 0; row < FIELD_SIZE[0]; row++) {
+      for (let col = 0; col < FIELD_SIZE[1]; col++) {
+        const v = this._model.field[row][col];
+        if (v === null) {
+          const crystal = this._crystals[row][col];
+          this._crystals[row][col] = null;
+          if (crystal !== null) this._scene.remove(crystal);
+        }
+      }
+    }
   }
 
   remove(x: number, y: number) {

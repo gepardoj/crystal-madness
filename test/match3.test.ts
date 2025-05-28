@@ -1,0 +1,56 @@
+import { describe, expect, it } from "vitest";
+import { Match3 } from "@/model/match3";
+
+describe("Match-3", () => {
+  it("finds matches correctly", () => {
+    const actual = Match3.findMatches([
+      [0, 1, 1, 1],
+      [0, 2, 1, 1],
+      [0, 2, 1, 3],
+      [0, 0, 0, 0],
+    ], 4, 4);
+    const expected = [
+      [0, 0], [0, 1], [0, 2], [0, 3],
+      [1, 0], [1, 2],
+      [2, 0], [2, 2],
+      [3, 0], [3, 1], [3, 2], [3, 3]
+    ];
+    console.table(actual);
+    expect(actual).toEqual(expect.arrayContaining(expected));
+    expect(actual).toHaveLength(expected.length);
+  });
+  it("finds matches correctly v2", () => {
+    const actual = Match3.findMatches([
+      [0, 1, 0, 0],
+      [1, 1, 1, 1],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+    ], 4, 4);
+    const expected = [
+      [0, 1],
+      [1, 0], [1, 1], [1, 2], [1, 3],
+      [2, 1],
+      [3, 1],
+    ];
+    console.table(actual);
+    expect(actual).toEqual(expect.arrayContaining(expected));
+    expect(actual).toHaveLength(expected.length);
+  });
+  it("finds matches correctly v3", () => {
+    const actual = Match3.findMatches([
+      [0, 1, 0, 0],
+      [1, 1, 0, 1],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+    ], 4, 4);
+    const expected = [
+      [0, 1], [0, 2],
+      [1, 1], [1, 2],
+      [2, 1], [2, 2],
+      [3, 1], [3, 2],
+    ];
+    console.table(actual);
+    expect(actual).toEqual(expect.arrayContaining(expected));
+    expect(actual).toHaveLength(expected.length);
+  });
+});
