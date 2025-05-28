@@ -15,10 +15,11 @@ describe("Match-3", () => {
       [2, 0], [2, 2],
       [3, 0], [3, 1], [3, 2], [3, 3]
     ];
-    console.table(actual);
+    // console.table(actual);
     expect(actual).toEqual(expect.arrayContaining(expected));
     expect(actual).toHaveLength(expected.length);
   });
+
   it("finds matches correctly v2", () => {
     const actual = Match3.findMatches([
       [0, 1, 0, 0],
@@ -32,10 +33,11 @@ describe("Match-3", () => {
       [2, 1],
       [3, 1],
     ];
-    console.table(actual);
+    // console.table(actual);
     expect(actual).toEqual(expect.arrayContaining(expected));
     expect(actual).toHaveLength(expected.length);
   });
+
   it("finds matches correctly v3", () => {
     const actual = Match3.findMatches([
       [0, 1, 0, 0],
@@ -49,8 +51,30 @@ describe("Match-3", () => {
       [2, 1], [2, 2],
       [3, 1], [3, 2],
     ];
-    console.table(actual);
+    // console.table(actual);
     expect(actual).toEqual(expect.arrayContaining(expected));
     expect(actual).toHaveLength(expected.length);
+  });
+
+  it("falls correctly v1", () => {
+    const given =
+      [[1, 1, null, null],
+      [2, null, 2, 2],
+      [null, 3, null, 3],
+      [4, null, null, 4]
+      ];
+    const actual = Match3.invokeFalling(given, 4, 4);
+    const expected = [
+      [null, null, null, null],
+      [1, null, null, 2],
+      [2, 1, null, 3],
+      [4, 3, 2, 4]
+    ];
+    console.table(given);
+    console.log("actual");
+    console.table(actual);
+    console.log("expected");
+    console.table(expected);
+    expect(actual).toEqual(expected);
   });
 });

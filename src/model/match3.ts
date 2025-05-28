@@ -6,7 +6,7 @@ export class Match3 {
    * @param grid Two-dimensional array
    * @returns Array of [row,col] pairs that matches in 3-or-more
    */
-  static findMatches(grid: unknown[][], maxRow: number, maxCol: number): [number, number][] {
+  static findMatches(grid: readonly unknown[][], maxRow: number, maxCol: number): [number, number][] {
     const matches: [number, number][] = [];
     for (let row = 0; row < maxRow; row++) {
       for (let col = 0; col < maxCol; col++) {
@@ -21,7 +21,7 @@ export class Match3 {
   /**
    * Find horizontally and vertically (like a rook in chess) that matches origin
    */
-  private static findRookWay(grid: unknown[][], rowIn: number, colIn: number, maxRow: number, maxCol: number) {
+  private static findRookWay(grid: readonly unknown[][], rowIn: number, colIn: number, maxRow: number, maxCol: number) {
     const vertMatches: [number, number][] = [[rowIn, colIn]];
     const origin = grid[rowIn][colIn];
     // up vertical check
@@ -48,5 +48,26 @@ export class Match3 {
     }
     if (horizMatches.length >= 3) return horizMatches;
     return [];
+  }
+
+  /**
+   * Elements should fall when there're emptiness (null) below them 
+   */
+  static invokeFalling(grid: readonly unknown[][], maxRow: number, maxCol: number) {
+    const clone = grid.map(row => row.map(v => v));
+
+    for (let col = 0; col < maxCol; col++) {
+      const values = Array(maxRow).fill(null);
+      let i = 0;
+      for (let row = maxRow - 1; row >= 0; row--) {
+        const el = clone[row][col];
+        if (el !== null) values[i++] = el;
+      }
+      i = 0;
+      for (let row = maxRow - 1; row >= 0; row--) {
+        clone[row][col] = values[i++];
+      }
+    }
+    return clone;
   }
 }
