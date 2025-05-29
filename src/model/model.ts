@@ -1,4 +1,5 @@
 import { Match3 } from "@/model/match3";
+import { Observer } from "@/observer";
 import { getRandom, swapD2 } from "@/utils";
 
 type Crystal = null | 0 | 1 | 2 | 3;
@@ -28,8 +29,25 @@ export class Model {
 
   cascadeMatch() {
     const matches = Match3.findMatches(this._field, FIELD_SIZE[0], FIELD_SIZE[1]);
-    console.table(matches);
+    if (matches.length === 0) return;
+    console.log("before match");
+    console.table(this._field);
     matches.forEach(([row, col]) => this._field[row][col] = null);
+    console.log("after match");
+    console.table(this._field);
+    Observer.notify("crystals_matched");
+    setTimeout(() => {
+      let i = 0;
+      for (const val of Match3.invokeFalling(this._field, FIELD_SIZE[0], FIELD_SIZE[1])) {
+        if (val.type === "step") {
+          setTimeout(() => Observer.notify("crystal_falling", val.from[0], val.from[1], val.to[0], val.to[1]), i * 200);
+        } else if (val.type === "result") {
+          this._field = val.grid;
+          // Observer.notify("crystal_matched");
+        }
+        i++;
+      }
+    }, 1000);
   }
 
   private generateField() {
@@ -40,6 +58,5 @@ export class Model {
         this._field[row][col] = crystal;
       }
     }
-    console.table(this._field);
   }
 }

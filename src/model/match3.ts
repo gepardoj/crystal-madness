@@ -1,5 +1,9 @@
 import { uniquePairs } from "@/utils";
 
+type FallingStep<T> =
+  { type: "step", from: [number, number], to: [number, number]; } |
+  { type: "result", grid: T[][]; };
+
 export class Match3 {
   /**
    * 
@@ -53,21 +57,25 @@ export class Match3 {
   /**
    * Elements should fall when there're emptiness (null) below them 
    */
-  static invokeFalling(grid: readonly unknown[][], maxRow: number, maxCol: number) {
+  static * invokeFalling<T>(grid: readonly T[][], maxRow: number, maxCol: number): Generator<FallingStep<T>> {
     const clone = grid.map(row => row.map(v => v));
-
     for (let col = 0; col < maxCol; col++) {
-      const values = Array(maxRow).fill(null);
-      let i = 0;
-      for (let row = maxRow - 1; row >= 0; row--) {
+      const values = Array(maxRow).fill(null); // placeholder for falled elements
+      const elementsCoords: [number, number][] = [];
+      for (let i = 0, row = maxRow - 1; row >= 0; row--) { // find all elements and write to beginning of array
         const el = clone[row][col];
-        if (el !== null) values[i++] = el;
+        if (el === null) continue;
+        values[i++] = el;
+        elementsCoords.push([row, col]);
       }
-      i = 0;
-      for (let row = maxRow - 1; row >= 0; row--) {
-        clone[row][col] = values[i++];
+      for (let i = 0, row = maxRow - 1; row >= 0; row--, i++) { // and copy them from bottom to right 
+        if (elementsCoords[i]?.[0] === row && elementsCoords[i]?.[1] === col) continue;
+        clone[row][col] = values[i];
+        if (values[i] === null) continue;
+        // console.log(elementsCoords[i], [row, col]);
+        yield { type: "step", from: elementsCoords[i], to: [row, col] };
       }
     }
-    return clone;
+    yield { type: "result", grid: clone };
   }
 }

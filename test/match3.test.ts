@@ -63,18 +63,46 @@ describe("Match-3", () => {
       [null, 3, null, 3],
       [4, null, null, 4]
       ];
-    const actual = Match3.invokeFalling(given, 4, 4);
+    const res = [...Match3.invokeFalling(given, 4, 4)].at(-1);
+    if (res?.type !== "result") return;
+    const actual = res.grid;
     const expected = [
       [null, null, null, null],
       [1, null, null, 2],
       [2, 1, null, 3],
       [4, 3, 2, 4]
     ];
-    console.table(given);
-    console.log("actual");
-    console.table(actual);
-    console.log("expected");
-    console.table(expected);
+    // console.table(given);
+    // console.log("actual");
+    // console.table(actual);
+    // console.log("expected");
+    // console.table(expected);
+    expect(actual).toEqual(expected);
+  });
+
+  it("falls correctly v2", () => {
+    const given = [
+      [null, null, null, null, 2],
+      [3, 1, 0, null, 3],
+      [1, 2, 0, null, 1],
+      [0, 1, 1, 3, 1],
+      [2, 1, null, null, null]
+    ];
+    const res = [...Match3.invokeFalling(given, 5, 5)].at(-1);
+    if (res?.type !== "result") return;
+    const actual = res.grid;
+    const expected = [
+      [null, null, null, null, null],
+      [3, 1, null, null, 2],
+      [1, 2, 0, null, 3],
+      [0, 1, 0, null, 1],
+      [2, 1, 1, 3, 1]
+    ];
+    // console.table(given);
+    // console.log("actual");
+    // console.table(actual);
+    // console.log("expected");
+    // console.table(expected);
     expect(actual).toEqual(expected);
   });
 });

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { gsap } from "gsap";
 import { FIELD_SIZE, type Model } from '@/model/model';
 import { swapD2 } from '@/utils';
+import { Observer } from '@/observer';
 
 const OFFSET = .4 as const;
 
@@ -41,6 +42,11 @@ export class View {
 
     this._camera.position.set(.8, -.8, 100);
 
+    this.onCrystalsMatched = this.onCrystalsMatched.bind(this);
+    this.onCrystalFalling = this.onCrystalFalling.bind(this);
+    Observer.subscribe("crystals_matched", this.onCrystalsMatched);
+    Observer.subscribe("crystal_falling", this.onCrystalFalling);
+
     console.log("the view is initialized");
   }
 
@@ -67,7 +73,23 @@ export class View {
     console.log("models are initialized");
   }
 
-  updateCrystals() {
+  private onCrystalsMatched() {
+    console.log("Model changed");
+    this.removeCrystals();
+  }
+
+  private onCrystalFalling(fromRow: number, fromCol: number, toRow: number, toCol: number) {
+    console.log("from", fromRow, fromCol, "to", toRow, toCol);
+    const crystal = this._crystals[fromRow][fromCol];
+    if (crystal === null) return;
+    const DISTANCE = .4 as const;
+    gsap.to(crystal.position, {
+      y: "-=" + (toRow - fromRow) * DISTANCE,
+      duration: .5,
+    });
+  }
+
+  removeCrystals() {
     for (let row = 0; row < FIELD_SIZE[0]; row++) {
       for (let col = 0; col < FIELD_SIZE[1]; col++) {
         const v = this._model.field[row][col];

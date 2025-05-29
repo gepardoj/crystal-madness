@@ -18,7 +18,6 @@ import { Controller } from '@/controller';
   });
   setTimeout(() => {
     model.cascadeMatch();
-    view.updateCrystals();
   }, 1000);
   controller.activate(true);
   const models = await promisedModels;
