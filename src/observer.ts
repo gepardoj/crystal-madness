@@ -3,7 +3,7 @@ import type { Vector2 } from "three";
 
 export type EventMap = {
   "crystals_matched": [readonly Crystal[][]],
-  "crystal_falling": [number, number, number, number];
+  "crystal_falling": ["old" | Crystal, number, number, number, number];
   "crystals_swap": [number, number, number, number, Vector2];
 };
 

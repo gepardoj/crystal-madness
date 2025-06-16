@@ -105,4 +105,23 @@ describe("Match-3", () => {
     // console.table(expected);
     expect(actual).toEqual(expected);
   });
+
+  it("falls new items correctly v1", () => {
+    const given = [
+      [null, null, null, null],
+      [1, null, null, 2],
+      [2, 1, null, 3],
+      [4, 3, 2, 4]
+    ];
+    const res = [...Match3.invokeFalling(given, 4, 4, () => 9)].at(-1);
+    if (res?.type !== "result") return;
+    const actual = res.grid;
+    const expected = [
+      [9, 9, 9, 9],
+      [1, 9, 9, 2],
+      [2, 1, 9, 3],
+      [4, 3, 2, 4]
+    ];
+    expect(actual).toEqual(expected);
+  });
 });

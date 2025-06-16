@@ -12,6 +12,7 @@ export class View {
   private _renderer: THREE.WebGLRenderer;
   private _camera: THREE.Camera;
 
+  private _crystal_models: THREE.Mesh[] = [];
   private _crystals: (THREE.Mesh | null)[][] = [];
 
   get canvas() { return this._renderer.domElement; }
@@ -56,6 +57,7 @@ export class View {
   }
 
   initCrystals(models: THREE.Mesh[], field: readonly Crystal[][]) {
+    this._crystal_models = models;
     for (let row = 0; row < FIELD_SIZE[0]; row++) {
       this._crystals[row] = [];
       for (let col = 0; col < FIELD_SIZE[1]; col++) {
@@ -82,15 +84,30 @@ export class View {
     this.removeCrystals(field);
   }
 
-  private onCrystalFalling(fromRow: number, fromCol: number, toRow: number, toCol: number) {
+  private onCrystalFalling(type: "old" | Crystal, fromRow: number, fromCol: number, toRow: number, toCol: number) {
     console.log("from", fromRow, fromCol, "to", toRow, toCol);
-    const crystal = this._crystals[fromRow][fromCol];
+    let crystal = null;
+    if (type === "old") {
+      crystal = this._crystals[fromRow][fromCol];
+      if (crystal === null) return;
+      this._crystals[fromRow][fromCol] = null;
+      this._crystals[toRow][toCol] = crystal;
+    } else if (type !== null) {
+      const mesh = this._crystal_models[type];
+      crystal = new THREE.Mesh(mesh.geometry, mesh.material);
+      this._scene.add(crystal);
+      crystal.position.set(fromCol * OFFSET, fromRow * -OFFSET, 0);
+      crystal.rotation.set(0, 0, 0);
+      crystal.scale.set(.05, .05, .05);
+      this._crystals[toRow][toCol] = crystal;
+    }
     if (crystal === null) return;
     const DISTANCE = .4 as const;
     gsap.to(crystal.position, {
       y: "-=" + (toRow - fromRow) * DISTANCE,
       duration: .5,
     });
+    console.table(this._crystals);
   }
 
   removeCrystals(field: readonly Crystal[][]) {

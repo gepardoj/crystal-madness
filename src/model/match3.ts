@@ -1,7 +1,7 @@
 import { uniquePairs } from "@/utils";
 
 type FallingStep<T> =
-  { type: "step", from: [number, number], to: [number, number]; } |
+  { type: "old" | T, from: [number, number], to: [number, number]; } |
   { type: "result", grid: T[][]; };
 
 export class Match3 {
@@ -57,7 +57,7 @@ export class Match3 {
   /**
    * Elements should fall when there're emptiness (null) below them 
    */
-  static * invokeFalling<T>(grid: readonly T[][], maxRow: number, maxCol: number): Generator<FallingStep<T>> {
+  static * invokeFalling<T>(grid: readonly T[][], maxRow: number, maxCol: number, newElements?: (i: number) => T): Generator<FallingStep<T>> {
     const clone = grid.map(row => row.map(v => v));
     for (let col = 0; col < maxCol; col++) {
       const values = Array(maxRow).fill(null); // placeholder for falled elements
@@ -73,7 +73,15 @@ export class Match3 {
         clone[row][col] = values[i];
         if (values[i] === null) continue;
         // console.log(elementsCoords[i], [row, col]);
-        yield { type: "step", from: elementsCoords[i], to: [row, col] };
+        yield { type: "old", from: elementsCoords[i], to: [row, col] };
+      }
+      if (newElements) {
+        for (let i = 0, row = maxRow - 1; row >= 0; row--, i++) {
+          if (clone[row][col] !== null) continue;
+          const el = newElements(i);
+          clone[row][col] = el;
+          yield { type: el, from: [-1, col], to: [row, col] };
+        }
       }
     }
     yield { type: "result", grid: clone };

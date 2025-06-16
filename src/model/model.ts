@@ -1,6 +1,6 @@
 import { Match3 } from "@/model/match3";
 import { Observer } from "@/observer";
-import { getRandom, swapD2 } from "@/utils";
+import { getRandomTo, swapD2 } from "@/utils";
 import type { Vector2 } from "three";
 
 export type Crystal = null | 0 | 1 | 2 | 3;
@@ -41,10 +41,11 @@ export class Model {
     Observer.notify("crystals_matched", this.field);
     setTimeout(() => {
       let i = 0;
-      for (const val of Match3.invokeFalling(this._field, FIELD_SIZE[0], FIELD_SIZE[1])) {
-        if (val.type === "step") {
-          setTimeout(() => Observer.notify("crystal_falling", val.from[0], val.from[1], val.to[0], val.to[1]), i * 200);
-        } else if (val.type === "result") {
+      for (const val of Match3.invokeFalling(this._field, FIELD_SIZE[0], FIELD_SIZE[1], () => getRandomTo<Crystal>(CRYSTAL_NUMBER))) {
+        if (val.type !== "result") {
+          setTimeout(() => Observer.notify("crystal_falling", val.type, val.from[0], val.from[1], val.to[0], val.to[1]), i * 200);
+        }
+        else if (val.type === "result") {
           this._field = val.grid;
           console.log("after fall");
           console.table(this.field);
@@ -59,7 +60,7 @@ export class Model {
     for (let row = 0; row < FIELD_SIZE[0]; row++) {
       this._field[row] = [];
       for (let col = 0; col < FIELD_SIZE[1]; col++) {
-        const crystal = Math.round(getRandom() * (CRYSTAL_NUMBER - 1)) as Crystal;
+        const crystal = getRandomTo<Crystal>(CRYSTAL_NUMBER);
         this._field[row][col] = crystal;
       }
     }
