@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { gsap } from "gsap";
-import { FIELD_SIZE, type Model } from '@/model/model';
+import { FIELD_SIZE, type Crystal } from '@/model/model';
 import { swapD2 } from '@/utils';
 import { Observer } from '@/observer';
 
@@ -8,7 +8,6 @@ const OFFSET = .4 as const;
 
 
 export class View {
-  private _model: Model;
   private _scene: THREE.Scene;
   private _renderer: THREE.WebGLRenderer;
   private _camera: THREE.Camera;
@@ -17,8 +16,7 @@ export class View {
 
   get canvas() { return this._renderer.domElement; }
 
-  constructor(model: Model) {
-    this._model = model;
+  constructor() {
     const canvas = document.querySelector("#game");
 
     this._scene = new THREE.Scene();
@@ -42,8 +40,10 @@ export class View {
 
     this._camera.position.set(.8, -.8, 100);
 
+    this.onCrystalsSwap = this.onCrystalsSwap.bind(this);
     this.onCrystalsMatched = this.onCrystalsMatched.bind(this);
     this.onCrystalFalling = this.onCrystalFalling.bind(this);
+    Observer.subscribe("crystals_swap", this.onCrystalsSwap);
     Observer.subscribe("crystals_matched", this.onCrystalsMatched);
     Observer.subscribe("crystal_falling", this.onCrystalFalling);
 
@@ -55,11 +55,11 @@ export class View {
     this._renderer.setAnimationLoop(() => this.animate());
   }
 
-  initCrystals(models: THREE.Mesh[]) {
+  initCrystals(models: THREE.Mesh[], field: readonly Crystal[][]) {
     for (let row = 0; row < FIELD_SIZE[0]; row++) {
       this._crystals[row] = [];
       for (let col = 0; col < FIELD_SIZE[1]; col++) {
-        const v = this._model.field[row][col];
+        const v = field[row][col];
         if (v === null) continue;
         const random = models[v];
         const crystal = new THREE.Mesh(random.geometry, random.material);
@@ -73,9 +73,13 @@ export class View {
     console.log("models are initialized");
   }
 
-  private onCrystalsMatched() {
+  private onCrystalsSwap(col: number, row: number, col2: number, row2: number, dir: THREE.Vector2) {
+    this.swap(col, row, col2, row2, dir);
+  }
+
+  private onCrystalsMatched(field: readonly Crystal[][]) {
     console.log("Model changed");
-    this.removeCrystals();
+    this.removeCrystals(field);
   }
 
   private onCrystalFalling(fromRow: number, fromCol: number, toRow: number, toCol: number) {
@@ -89,10 +93,10 @@ export class View {
     });
   }
 
-  removeCrystals() {
+  removeCrystals(field: readonly Crystal[][]) {
     for (let row = 0; row < FIELD_SIZE[0]; row++) {
       for (let col = 0; col < FIELD_SIZE[1]; col++) {
-        const v = this._model.field[row][col];
+        const v = field[row][col];
         if (v === null) {
           const crystal = this._crystals[row][col];
           this._crystals[row][col] = null;
